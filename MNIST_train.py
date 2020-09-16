@@ -1,52 +1,69 @@
-import tensorflow as tf
-import random
 import time
+import random
 import os
 from tensorflow.examples.tutorials.mnist import input_data
+import tensorflow as tf
 
-# HYPERPARAMETERS
+seed_input = input(">> Input seed in integer(0 to randomize): ")
+
+### HYPERPARAMETERS STARTS
+if seed_input == "0":
+    SEED = random.randint(0, 10000)
+    print(f">> Randomize seed: {SEED}")
+else:
+    SEED = int(seed_input)
+    print(f">> Input seed: {SEED}")
+
+INPUT_SIZE = 28 * 28
+OUTPUT_SIZE = 10
+HIDDEN_L_SIZE = [300, 200]
+
 LEARNING_RATE = 0.001
+
+DROPOUT_PROB = 0.5
+LAMBDA = 0.0001
+
 TRAINING_EPOCHS = 30
 BATCH_SIZE = 100
-DROPOUT_PROB = 0.5
-LAMBDA = 1
+### HYPERPARAMETERS ENDS
 
+tf.set_random_seed(SEED)
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, validation_size=5000)
 # one_hot = True, 4-> 0, 0, 0, 0, 1, 0, 0, 0, 0, 0
 
-X = tf.placeholder(tf.float32, [None, 784], name="X")  # input data가 들어올 자리
-Y = tf.placeholder(tf.float32, [None, 10], name="Y")  # 정답이 들어올 자리, [0 0 0 0 0 0 0 0 0 1] one-hot encoding 형태
+X = tf.placeholder(tf.float32, [None, INPUT_SIZE], name="X")  # input data가 들어올 자리
+Y = tf.placeholder(tf.float32, [None, OUTPUT_SIZE], name="Y")  # 정답이 들어올 자리, [0 0 0 0 0 0 0 0 0 1] one-hot encoding 형태
 # TODO [complete] *hint* dropout 확률을 위한 placeholder
-dropout_prob = tf.placeholder(tf.float32)
+dropout_prob = tf.placeholder(tf.float32, name="dropout_prob")
 # dropout = tf.placeholder()
 
 # 1st Hidden Layer
-W1 = tf.get_variable("W1", shape=[784, 300], initializer=tf.contrib.layers.xavier_initializer())  # 첫 번째 층의 weight matrix
-b1 = tf.Variable(tf.random_normal([300]))  # 첫 번째 층의 bias
+W1 = tf.get_variable("W1", shape=[INPUT_SIZE, HIDDEN_L_SIZE[0]], initializer=tf.contrib.layers.xavier_initializer())  # 첫 번째 층의 weight matrix
+b1 = tf.Variable(tf.random_normal([HIDDEN_L_SIZE[0]]), name="b1")  # 첫 번째 층의 bias
 L1 = tf.nn.relu(tf.matmul(X, W1) + b1)  # Affine 연산 및 activation
 # TODO [complete] *hint* tf.nn.dropout으로 dropout 적용
-L1 = tf.nn.dropout(L1, dropout_prob)
+L1 = tf.nn.dropout(L1, rate=dropout_prob)
 # TODO *hint* tf.nn.l2_loss로 parameter들의 l2_norm 값 누적
 weight_decay = tf.nn.l2_loss(W1)
 
 # 2nd Hidden Layer
-W2 = tf.get_variable("W2", shape=[300, 200], initializer=tf.contrib.layers.xavier_initializer())
+W2 = tf.get_variable("W2", shape=[HIDDEN_L_SIZE[0], HIDDEN_L_SIZE[1]], initializer=tf.contrib.layers.xavier_initializer())
 # TODO [complete] *hint* weight initialization을 위해 "initializer" 파라미터에 특정 초기화 기법을 입력
-b2 = tf.Variable(tf.random_normal([200]))
+b2 = tf.Variable(tf.random_normal([HIDDEN_L_SIZE[1]]), name="b2")
 L2 = tf.nn.relu(tf.matmul(L1, W2) + b2)
 # TODO [complete] *hint* tf.nn.dropout으로 dropout 적용
-L2 = tf.nn.dropout(L2, dropout_prob)
+L2 = tf.nn.dropout(L2, rate=dropout_prob)
 # TODO *hint* tf.nn.l2_loss로 parameter들의 l2_norm 값 누적
 weight_decay = tf.add(tf.nn.l2_loss(W2), weight_decay)
 
 # 3rd Hidden Layer
-W3 = tf.get_variable("W3", shape=[200, 10], initializer=tf.contrib.layers.xavier_initializer())
-b3 = tf.Variable(tf.random_normal([10]))
+W3 = tf.get_variable("W3", shape=[HIDDEN_L_SIZE[1], OUTPUT_SIZE], initializer=tf.contrib.layers.xavier_initializer())
+b3 = tf.Variable(tf.random_normal([OUTPUT_SIZE]), name="b3")
 # TODO *hint* tf.nn.l2_loss로 parameter들의 l2_norm 값 누적
 weight_decay = tf.add(tf.nn.l2_loss(W3), weight_decay)
 
 hypothesis = tf.nn.xw_plus_b(L2, W3, b3, name="hypothesis")  # L2W3 + b3
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=hypothesis, labels=Y))
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=hypothesis, labels=Y))
 # cost = tf.reduce_mean(-tf.reduce_sum(Y * tf.log(hypothesis), axis=1))와 같은 의미
 # hypothesis를 softmax를 통해 확률값으로 변형, Y와 비교해 cross_entropy error 계산
 # reduced_mean은 모든 차원을 제거하고 단 하나의 스칼라 평균을 리턴함
@@ -54,7 +71,7 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=hypothesis,
 # 여기까지 에러의 평균(cost)이 계산됨.
 
 # TODO *hint* cost에 weight decay 적용
-cost = cost + LAMBDA * weight_decay
+cost += LAMBDA * weight_decay
 
 correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(Y, 1))
 # Y = [0,0,0,1,0,0,0,0,0,0], argmax로 실제 정답 인덱스 표현 e.g., argmax([0,0,0,1,0,0,0,0,0,0]) -> 3
@@ -103,9 +120,10 @@ for epoch in range(TRAINING_EPOCHS):
     # iteration 55000/ 100 = 550
     total_batch = int(mnist.train.num_examples / BATCH_SIZE)
 
+    a = None
     for i in range(total_batch):
         batch_xs, batch_ys = mnist.train.next_batch(BATCH_SIZE)
-        # batch size 단위로 input과 정답 리턴, e.g., (100, 784), (100, 10),
+        # batch size 단위로 input과 정답 리턴, e.g., (100, INPUT_SIZE), (100, 10),
         # TODO [complete] *hint* dropout 확률을 placeholder에 추가
         feed_dict = {X: batch_xs, Y: batch_ys, dropout_prob: DROPOUT_PROB}  # placeholder에 실제 data를 먹여주기 위한 dictionary
         c, _, a = sess.run([cost, optimizer, summary_op], feed_dict=feed_dict)
@@ -131,7 +149,9 @@ for epoch in range(TRAINING_EPOCHS):
 
 training_time = (time.time() - start_time) / 60
 
-print('\n** Learning Finished!')
+print(f'\n** Learning Finished! (SEED={SEED})')
 print('- Validation Max Accuracy:', max_accuracy)
-print('- Early stopped time:', early_stopped)
-print('- training time: ', training_time)
+print('- Early stopped time:     ', early_stopped)
+print('- Training time:          ', training_time)
+print('- Timestamp:              ', timestamp)
+
