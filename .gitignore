@@ -1,5 +1,6 @@
 runs/
 MNIST_data/
+.idea
 *.pptx
 *.pdf
 *.xlsx
