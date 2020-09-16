@@ -1,0 +1,11 @@
+
+runs/1600252017/checkpoints/model-16.meta
+runs/1600252017/checkpoints/checkpoint
+*.data-00000-of-00001
+runs/1600252017/checkpoints/model-16.index
+runs/1600252017/checkpoints/model-6.index
+runs/1600252017/checkpoints/model-6.meta
+runs/1600252017/checkpoints/model-9.index
+runs/1600252017/checkpoints/model-9.meta
+runs/1600252017/summaries/dev/events.out.tfevents.1600252018.JAEMIN-DESKTOP
+runs/1600252017/summaries/train/events.out.tfevents.1600252017.JAEMIN-DESKTOP
