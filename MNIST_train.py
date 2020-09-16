@@ -9,13 +9,14 @@ LEARNING_RATE = 0.001
 TRAINING_EPOCHS = 30
 BATCH_SIZE = 100
 DROPOUT_PROB = 0.5
+LAMBDA = 1
 
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, validation_size=5000)
 # one_hot = True, 4-> 0, 0, 0, 0, 1, 0, 0, 0, 0, 0
 
 X = tf.placeholder(tf.float32, [None, 784], name="X")  # input data가 들어올 자리
 Y = tf.placeholder(tf.float32, [None, 10], name="Y")  # 정답이 들어올 자리, [0 0 0 0 0 0 0 0 0 1] one-hot encoding 형태
-# TODO *hint* dropout 확률을 위한 placeholder
+# TODO [complete] *hint* dropout 확률을 위한 placeholder
 dropout_prob = tf.placeholder(tf.float32)
 # dropout = tf.placeholder()
 
@@ -23,23 +24,26 @@ dropout_prob = tf.placeholder(tf.float32)
 W1 = tf.get_variable("W1", shape=[784, 300], initializer=tf.contrib.layers.xavier_initializer())  # 첫 번째 층의 weight matrix
 b1 = tf.Variable(tf.random_normal([300]))  # 첫 번째 층의 bias
 L1 = tf.nn.relu(tf.matmul(X, W1) + b1)  # Affine 연산 및 activation
-# TODO *hint* tf.nn.dropout으로 dropout 적용
+# TODO [complete] *hint* tf.nn.dropout으로 dropout 적용
 L1 = tf.nn.dropout(L1, dropout_prob)
 # TODO *hint* tf.nn.l2_loss로 parameter들의 l2_norm 값 누적
+weight_decay = tf.nn.l2_loss(W1)
 
 # 2nd Hidden Layer
 W2 = tf.get_variable("W2", shape=[300, 200], initializer=tf.contrib.layers.xavier_initializer())
-# TODO *hint* weight initialization을 위해 "initializer" 파라미터에 특정 초기화 기법을 입력
+# TODO [complete] *hint* weight initialization을 위해 "initializer" 파라미터에 특정 초기화 기법을 입력
 b2 = tf.Variable(tf.random_normal([200]))
 L2 = tf.nn.relu(tf.matmul(L1, W2) + b2)
-# TODO *hint* tf.nn.dropout으로 dropout 적용
+# TODO [complete] *hint* tf.nn.dropout으로 dropout 적용
 L2 = tf.nn.dropout(L2, dropout_prob)
 # TODO *hint* tf.nn.l2_loss로 parameter들의 l2_norm 값 누적
+weight_decay = tf.add(tf.nn.l2_loss(W2), weight_decay)
 
 # 3rd Hidden Layer
 W3 = tf.get_variable("W3", shape=[200, 10], initializer=tf.contrib.layers.xavier_initializer())
 b3 = tf.Variable(tf.random_normal([10]))
 # TODO *hint* tf.nn.l2_loss로 parameter들의 l2_norm 값 누적
+weight_decay = tf.add(tf.nn.l2_loss(W3), weight_decay)
 
 hypothesis = tf.nn.xw_plus_b(L2, W3, b3, name="hypothesis")  # L2W3 + b3
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=hypothesis, labels=Y))
@@ -50,6 +54,7 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=hypothesis,
 # 여기까지 에러의 평균(cost)이 계산됨.
 
 # TODO *hint* cost에 weight decay 적용
+cost = cost + LAMBDA * weight_decay
 
 correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(Y, 1))
 # Y = [0,0,0,1,0,0,0,0,0,0], argmax로 실제 정답 인덱스 표현 e.g., argmax([0,0,0,1,0,0,0,0,0,0]) -> 3
@@ -101,7 +106,7 @@ for epoch in range(TRAINING_EPOCHS):
     for i in range(total_batch):
         batch_xs, batch_ys = mnist.train.next_batch(BATCH_SIZE)
         # batch size 단위로 input과 정답 리턴, e.g., (100, 784), (100, 10),
-        # TODO *hint* dropout 확률을 placeholder에 추가
+        # TODO [complete] *hint* dropout 확률을 placeholder에 추가
         feed_dict = {X: batch_xs, Y: batch_ys, dropout_prob: DROPOUT_PROB}  # placeholder에 실제 data를 먹여주기 위한 dictionary
         c, _, a = sess.run([cost, optimizer, summary_op], feed_dict=feed_dict)
         # sess.run을 통해 원하는 operation 실행 및 결과값 return
@@ -111,7 +116,7 @@ for epoch in range(TRAINING_EPOCHS):
     # 시각화를 위한 accuracy 값 저장, validation accuracy 계산
     # ========================================================================
     train_summary_writer.add_summary(a, epoch)  ##
-    # TODO *hint* dropout 확률을 placeholder에 추가
+    # TODO [complete] *hint* dropout 확률을 placeholder에 추가
     val_accuracy, summaries = sess.run([accuracy, summary_op], feed_dict={X: mnist.validation.images, Y: mnist.validation.labels, dropout_prob: DROPOUT_PROB})
     val_summary_writer.add_summary(summaries, epoch)  ##
     # ========================================================================
@@ -126,7 +131,7 @@ for epoch in range(TRAINING_EPOCHS):
 
 training_time = (time.time() - start_time) / 60
 
-print('** Learning Finished!')
+print('\n** Learning Finished!')
 print('- Validation Max Accuracy:', max_accuracy)
 print('- Early stopped time:', early_stopped)
 print('- training time: ', training_time)
