@@ -140,7 +140,7 @@ for p in presets:
                 feed_dict = {X: batch_xs, Y: batch_ys, dropout_prob: h_p.DROPOUT}
             else:
                 feed_dict = {X: batch_xs, Y: batch_ys}
-            c, _, a = sess.run([cost, optimizer, summary_op], feed_dict=feed_dict)
+            c, _, a = sess.run([cost, optimizer, accuracy], feed_dict=feed_dict)
             # sess.run을 통해 원하는 operation 실행 및 결과값 return
             avg_cost += c / total_batch
             avg_acc += a / total_batch
