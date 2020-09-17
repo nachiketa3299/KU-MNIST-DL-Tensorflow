@@ -1,7 +1,6 @@
 import tensorflow as tf
 import os
 from tensorflow.examples.tutorials.mnist import input_data
-import setting_01 as m
 
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, validation_size=5000)
 # 모델이 저장된 checkpoint 경로
@@ -15,7 +14,7 @@ graph = tf.Graph()
 with graph.as_default():
     sess = tf.Session()
     with sess.as_default():
-        saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
+        saver = tf.train.import_meta_graph(f"{checkpoint_file}.meta")
         saver.restore(sess, checkpoint_file) # 저장했던 모델 load
 
         # Get the placeholders from the graph by name, name을 통해 operation 가져오기
@@ -32,7 +31,5 @@ with graph.as_default():
         # TODO *hint* dropout 확률을 placeholder에 추가
         print('- Test Max Accuracy:', test_accuracy)
 
-if input("\n>> Run tensorboard?(y/n): ") == 'y':
-    os.system(f"tensorboard --logdir=.runs/{m.timestamp}")
 
 

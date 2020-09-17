@@ -33,10 +33,11 @@ for p in presets:
         act_func = tf.nn.relu
 
     for i in range(0, h_p.N_OF_HIDDEN_L):
-        # Weight Matrix의 이름과 Bias의 이름 결정
+        # W, B, L의 이름 결정
         w_name = "W" + str(i + 1)
         b_name = "B" + str(i + 1)
         l_name = "L" + str(i + 1)
+
         # Weight Matrix의 Layer별 Shape 결정
         if i == 0:
             w_shape = [h_p.INPUT_SIZE, h_p.HIDDEN_L_SIZE[i]]
@@ -44,6 +45,7 @@ for p in presets:
             w_shape = [h_p.HIDDEN_L_SIZE[i - 1], h_p.HIDDEN_L_SIZE[i]]
         else:
             w_shape = [h_p.HIDDEN_L_SIZE[i - 1], h_p.OUTPUT_SIZE]
+
         # Weight Initialization의 방법 결정
         if h_p.WEIGHT_INIT == "he":
             w_init = tf.contrib.layers.variance_scaling_initializer()
@@ -55,13 +57,13 @@ for p in presets:
         w_temp = tf.get_variable(w_name, shape=w_shape, initializer=w_init)
         W.append(w_temp)
 
-        # Bias 선언
+        # Bias 선언 및 초기화 (initialize를 무작위로 진행)
         if i != h_p.N_OF_HIDDEN_L - 1:
             B.append(tf.Variable(tf.random_normal([h_p.HIDDEN_L_SIZE[i]]), name=b_name))
         else:
             B.append(tf.Variable(tf.random_normal([h_p.OUTPUT_SIZE]), name=b_name))
 
-        # Graph 추가 후 활성화함수 적용.
+        # Graph 추가 후 활성화함수 적용. (Dropout 여부에 따라서 다름)
         if i == 0:
             L.append(act_func(tf.matmul(X, W[i]) + B[i]))
             if h_p.DROPOUT is not None:
@@ -75,26 +77,30 @@ for p in presets:
             hypothesis = tf.nn.xw_plus_b(L[i - 1], W[i], B[i], name='hypothesis')
             cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=hypothesis, labels=Y))
 
+    # Dropout을 위한 placeholder 선언
     if h_p.DROPOUT is not None:
         dropout_prob = tf.placeholder(tf.float32, name="dropout_prob")
 
+    # Weight Decay 여부에 따라 진행
     if h_p.WEIGHT_DECAY is not None:
         for i in range(len(W)):
             if i == 0:
                 weight_decay = tf.nn.l2_loss(W[i])
             else:
                 weight_decay = tf.add(tf.nn.l2_loss(W[i]), weight_decay)
+        # WeightDecay가 적용된 cost
         cost += h_p.WEIGHT_DECAY * weight_decay
 
     correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(Y, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     summary_op = tf.summary.scalar("accuracy", accuracy)
 
-    # back propagation with optimizer
+    # 사용할 Optimizer 설정 및 Backpropagation
     if h_p.OPTIMIZER == 'adam':
         optimizer = tf.train.AdamOptimizer(learning_rate=h_p.LEARNING_RATE).minimize(cost)
     elif h_p.OPTIMIZER == 'adadelta':
         optimizer = tf.train.AdadeltaOptimizer(learning_rate=h_p.LEARNING_RATE).minimize(cost)
+
 
     # initialize
     sess = tf.Session()
@@ -120,11 +126,11 @@ for p in presets:
     max_accuracy = 0
     early_stopped = 0
 
-    start_time = time.time()
     filename = f"./log.txt"
     file = open(filename, 'a')
     file.write(f"{timestamp}\n")
 
+    start_time = time.time()
     for epoch in range(h_p.TRAINING_EPOCH):
         # 전체 training data에 대한 평균 loss를 저장할 변수 초기화
         avg_cost = 0
