@@ -14,8 +14,6 @@ for p in presets:
     h_p = hp.hyperparameters(preset=p)
     tf.set_random_seed(h_p.SEED)
 
-
-
     ## 레이어 선언
     X = tf.placeholder(tf.float32, [None, h_p.INPUT_SIZE], name="X")
     Y = tf.placeholder(tf.float32, [None, h_p.OUTPUT_SIZE], name="Y")
@@ -66,20 +64,17 @@ for p in presets:
         # Graph 추가 후 활성화함수 적용. (Dropout 여부에 따라서 다름)
         if i == 0:
             L.append(act_func(tf.matmul(X, W[i]) + B[i]))
-            if h_p.DROPOUT is not None:
-                L[i] = tf.nn.dropout(L[i], rate=h_p.DROPOUT)
+            L[i] = tf.nn.dropout(L[i], rate=h_p.DROPOUT)
         elif i != h_p.N_OF_HIDDEN_L - 1:
             L.append(act_func(tf.matmul(L[i - 1], W[i]) + B[i]))
-            if h_p.DROPOUT is not None:
-                L[i] = tf.nn.dropout(L[i], rate=h_p.DROPOUT)
+            L[i] = tf.nn.dropout(L[i], rate=h_p.DROPOUT)
         # Output으로 나가는 마지막 레이어에서 cost를 계산
         else:
             hypothesis = tf.nn.xw_plus_b(L[i - 1], W[i], B[i], name='hypothesis')
             cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=hypothesis, labels=Y))
 
     # Dropout을 위한 placeholder 선언
-    if h_p.DROPOUT is not None:
-        dropout_prob = tf.placeholder(tf.float32, name="dropout_prob")
+    dropout_prob = tf.placeholder(tf.float32, name="dropout_prob")
 
     # Weight Decay 여부에 따라 진행
     if h_p.WEIGHT_DECAY is not None:
@@ -155,10 +150,7 @@ for p in presets:
             # batch size 단위로 input과 정답 리턴, e.g., (100, INPUT_SIZE), (100, 10),
 
             # TODO [complete] *hint* dropout 확률을 placeholder에 추가
-            if h_p.DROPOUT is not None:
-                feed_dict = {X: batch_xs, Y: batch_ys, dropout_prob: h_p.DROPOUT}
-            else:
-                feed_dict = {X: batch_xs, Y: batch_ys}
+            feed_dict = {X: batch_xs, Y: batch_ys, dropout_prob: h_p.DROPOUT}
 
             # cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=hypothesis, labels=Y))
             # optimizer = tf.train.AdamOptimizer(learning_rate=h_p.LEARNING_RATE).minimize(cost)
@@ -178,16 +170,14 @@ for p in presets:
 
         # TODO [complete] *hint* dropout 확률을 placeholder에 추가
         # summary_op = tf.summary.scalar("accuracy", accuracy)
-        if h_p.DROPOUT is not None:
-            val_accuracy, summaries = sess.run([accuracy, summary_op], feed_dict={X: mnist.validation.images, Y: mnist.validation.labels, dropout_prob: h_p.DROPOUT})
-        else:
-            val_accuracy, summaries = sess.run([accuracy, summary_op], feed_dict={X: mnist.validation.images, Y: mnist.validation.labels})
+        val_accuracy, summaries = sess.run([accuracy, summary_op], feed_dict={X: mnist.validation.images, Y: mnist.validation.labels, dropout_prob: h_p.DROPOUT})
         val_summary_writer.add_summary(summaries, epoch)  ##
         # ========================================================================
 
         # Terminal output
         print(f'> Preset: {p}/{len(presets)}  Epoch: {format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  training_cost={"{:.9f}".format(avg_cost)}\tvalidation_accuracy={val_accuracy}')
-        file.write(f'{format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  {"{:.9f}".format(avg_cost)}  {val_accuracy}\n')
+        # ./log.txt output
+        file.write(f'preset({h_p.PRESET}/{len(presets)})\t{format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  {"{:.9f}".format(avg_cost)}  {val_accuracy}\n')
 
         if val_accuracy > max_accuracy:  # validation accuracy가 경신될 때
             max_accuracy = val_accuracy

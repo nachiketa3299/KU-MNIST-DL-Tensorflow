@@ -16,7 +16,7 @@ class hyperparameters:
             self.WEIGHT_INIT = None
             self.OPTIMIZER = None
             self.WEIGHT_DECAY = None
-            self.DROPOUT = None
+            self.DROPOUT = 0
         elif preset == 1:
             self.BATCH_SIZE = 200
             self.LEARNING_RATE = 0.001
@@ -27,7 +27,7 @@ class hyperparameters:
             self.WEIGHT_INIT = None
             self.OPTIMIZER = "adam"
             self.WEIGHT_DECAY = None
-            self.DROPOUT = None
+            self.DROPOUT = 0
         elif preset == 2:
             self.BATCH_SIZE = 200
             self.LEARNING_RATE = 0.001
@@ -38,7 +38,7 @@ class hyperparameters:
             self.WEIGHT_INIT = None
             self.OPTIMIZER = "adam"
             self.WEIGHT_DECAY = None
-            self.DROPOUT = None
+            self.DROPOUT = 0
         elif preset == 3:
             self.BATCH_SIZE = 200
             self.LEARNING_RATE = 0.001
@@ -49,7 +49,7 @@ class hyperparameters:
             self.WEIGHT_INIT = None
             self.OPTIMIZER = "adam"
             self.WEIGHT_DECAY = None
-            self.DROPOUT = None
+            self.DROPOUT = 0
         elif preset == 4:
             self.BATCH_SIZE = 200
             self.LEARNING_RATE = 0.001
@@ -60,7 +60,7 @@ class hyperparameters:
             self.WEIGHT_INIT = None
             self.OPTIMIZER = "adam"
             self.WEIGHT_DECAY = None
-            self.DROPOUT = None
+            self.DROPOUT = 0
         elif preset == 5:
             self.BATCH_SIZE = 200
             self.LEARNING_RATE = 0.001
@@ -71,7 +71,7 @@ class hyperparameters:
             self.WEIGHT_INIT = "he"
             self.OPTIMIZER = "adadelta"
             self.WEIGHT_DECAY = None
-            self.DROPOUT = None
+            self.DROPOUT = 0
         elif preset == 6:
             self.BATCH_SIZE = 200
             self.LEARNING_RATE = 0.001
@@ -82,7 +82,7 @@ class hyperparameters:
             self.WEIGHT_INIT = "he"
             self.OPTIMIZER = "adam"
             self.WEIGHT_DECAY = 0.01
-            self.DROPOUT = None
+            self.DROPOUT = 0
         elif preset == 7:
             self.BATCH_SIZE = 200
             self.LEARNING_RATE = 0.01
@@ -93,7 +93,7 @@ class hyperparameters:
             self.WEIGHT_INIT = "he"
             self.OPTIMIZER = "adam"
             self.WEIGHT_DECAY = 0.01
-            self.DROPOUT = None
+            self.DROPOUT = 0
         elif preset == 8:
             self.BATCH_SIZE = 200
             self.LEARNING_RATE = 0.01
