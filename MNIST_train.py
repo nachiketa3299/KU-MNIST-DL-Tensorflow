@@ -109,12 +109,21 @@ for p in presets:
     # 저장 directory와 tensor board 시각화를 위한 코드
     # ========================================================================
     timestamp = str(int(time.time()))  # runs/{timestamp}/checkpoints/
+
+    # ./runs/{timestampe}
     out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
+
+    # ./runs/{timestamp}/summaries/train
     train_summary_dir = os.path.join(out_dir, "summaries", "train")
     train_summary_writer = tf.summary.FileWriter(train_summary_dir, sess.graph)
+
+    # ./runs/{timestamp}/summaries/dev
     val_summary_dir = os.path.join(out_dir, "summaries", "dev")
     val_summary_writer = tf.summary.FileWriter(val_summary_dir, sess.graph)
+
+    # ./runs/{timestamp}/checkpoints
     checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
+    # ./runs/{timestamp}/checkpoints/model
     checkpoint_prefix = os.path.join(checkpoint_dir, "model")
     # ========================================================================
 
@@ -126,6 +135,7 @@ for p in presets:
     max_accuracy = 0
     early_stopped = 0
 
+    # training log를 기록하기 위한 txt 파일. ./log.txt
     filename = f"./log.txt"
     file = open(filename, 'a')
     file.write(f"{timestamp}\n")
@@ -135,18 +145,27 @@ for p in presets:
         # 전체 training data에 대한 평균 loss를 저장할 변수 초기화
         avg_cost = 0
         avg_acc = 0
-        # iteration 55000/ 100 = 550
+        # 총 iteration 횟수 = Mnist 트레이닝 데이터 숫자 / 배치사이즈
         total_batch = int(mnist.train.num_examples / h_p.BATCH_SIZE)
 
+        # Iteration
         for i in range(total_batch):
+            # batch_xs는 배치 인풋, batch_ys는 배치 정답 (크기는 모두 batch size)
             batch_xs, batch_ys = mnist.train.next_batch(h_p.BATCH_SIZE)
             # batch size 단위로 input과 정답 리턴, e.g., (100, INPUT_SIZE), (100, 10),
+
             # TODO [complete] *hint* dropout 확률을 placeholder에 추가
             if h_p.DROPOUT is not None:
                 feed_dict = {X: batch_xs, Y: batch_ys, dropout_prob: h_p.DROPOUT}
             else:
                 feed_dict = {X: batch_xs, Y: batch_ys}
+
+            # cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=hypothesis, labels=Y))
+            # optimizer = tf.train.AdamOptimizer(learning_rate=h_p.LEARNING_RATE).minimize(cost)
+            # accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
             c, _, a = sess.run([cost, optimizer, accuracy], feed_dict=feed_dict)
+            # cost 에서 Loss들이 구해지고, 그것을 바탕으로 optimizer에서 Backpropagation이 이루어짐, 그리고 모델이 얼마나 정확한 출력을 리턴했는지 accuracy를 측정
             # sess.run을 통해 원하는 operation 실행 및 결과값 return
             avg_cost += c / total_batch
             avg_acc += a / total_batch
@@ -156,7 +175,9 @@ for p in presets:
         # ========================================================================
         train_summary = tf.Summary(value=[tf.Summary.Value(tag='train_accuracy', simple_value=avg_acc)])
         train_summary_writer.add_summary(train_summary, epoch)  ##
+
         # TODO [complete] *hint* dropout 확률을 placeholder에 추가
+        # summary_op = tf.summary.scalar("accuracy", accuracy)
         if h_p.DROPOUT is not None:
             val_accuracy, summaries = sess.run([accuracy, summary_op], feed_dict={X: mnist.validation.images, Y: mnist.validation.labels, dropout_prob: h_p.DROPOUT})
         else:
@@ -164,6 +185,7 @@ for p in presets:
         val_summary_writer.add_summary(summaries, epoch)  ##
         # ========================================================================
 
+        # Terminal output
         print(f'> Preset: {p}/{len(presets)}  Epoch: {format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  training_cost={"{:.9f}".format(avg_cost)}\tvalidation_accuracy={val_accuracy}')
         file.write(f'{format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  {"{:.9f}".format(avg_cost)}  {val_accuracy}\n')
 
