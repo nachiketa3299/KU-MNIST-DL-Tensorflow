@@ -61,7 +61,7 @@ for p in presets:
         else:
             B.append(tf.Variable(tf.random_normal([h_p.OUTPUT_SIZE]), name=b_name))
 
-        # Graph 추가 후 활성화함수 적용. (Dropout 여부에 따라서 다름)
+        # Graph 추가 후 활성화함수 적용.
         if i == 0:
             L.append(act_func(tf.matmul(X, W[i]) + B[i]))
             L[i] = tf.nn.dropout(L[i], rate=h_p.DROPOUT)
@@ -76,14 +76,13 @@ for p in presets:
     # Dropout을 위한 placeholder 선언
     dropout_prob = tf.placeholder(tf.float32, name="dropout_prob")
 
-    # Weight Decay 여부에 따라 진행
-    if h_p.WEIGHT_DECAY is not None:
-        for i in range(len(W)):
-            if i == 0:
-                weight_decay = tf.nn.l2_loss(W[i])
-            else:
-                weight_decay = tf.add(tf.nn.l2_loss(W[i]), weight_decay)
-        # WeightDecay가 적용된 cost
+    # cost에 Weight Decay
+    for i in range(len(W)):
+        if i == 0:
+            weight_decay = tf.nn.l2_loss(W[i])
+        else:
+            weight_decay = tf.add(tf.nn.l2_loss(W[i]), weight_decay)
+        # WeightDecay가 적용된 cost. WEIGHT_DECAY가 0이면 적용되지 않은 것과 같다.
         cost += h_p.WEIGHT_DECAY * weight_decay
 
     correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(Y, 1))

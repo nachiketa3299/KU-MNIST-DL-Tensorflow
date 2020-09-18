@@ -15,7 +15,7 @@ class hyperparameters:
             self.TRAINING_EPOCH = 30
             self.WEIGHT_INIT = None
             self.OPTIMIZER = None
-            self.WEIGHT_DECAY = None
+            self.WEIGHT_DECAY = 0
             self.DROPOUT = 0
         elif preset == 1:
             self.BATCH_SIZE = 200
@@ -26,7 +26,7 @@ class hyperparameters:
             self.TRAINING_EPOCH = 30
             self.WEIGHT_INIT = None
             self.OPTIMIZER = "adam"
-            self.WEIGHT_DECAY = None
+            self.WEIGHT_DECAY = 0
             self.DROPOUT = 0
         elif preset == 2:
             self.BATCH_SIZE = 200
@@ -37,7 +37,7 @@ class hyperparameters:
             self.TRAINING_EPOCH = 100
             self.WEIGHT_INIT = None
             self.OPTIMIZER = "adam"
-            self.WEIGHT_DECAY = None
+            self.WEIGHT_DECAY = 0
             self.DROPOUT = 0
         elif preset == 3:
             self.BATCH_SIZE = 200
@@ -48,7 +48,7 @@ class hyperparameters:
             self.TRAINING_EPOCH = 100
             self.WEIGHT_INIT = None
             self.OPTIMIZER = "adam"
-            self.WEIGHT_DECAY = None
+            self.WEIGHT_DECAY = 0
             self.DROPOUT = 0
         elif preset == 4:
             self.BATCH_SIZE = 200
@@ -59,7 +59,7 @@ class hyperparameters:
             self.TRAINING_EPOCH = 100
             self.WEIGHT_INIT = None
             self.OPTIMIZER = "adam"
-            self.WEIGHT_DECAY = None
+            self.WEIGHT_DECAY = 0
             self.DROPOUT = 0
         elif preset == 5:
             self.BATCH_SIZE = 200
@@ -70,7 +70,7 @@ class hyperparameters:
             self.TRAINING_EPOCH = 100
             self.WEIGHT_INIT = "he"
             self.OPTIMIZER = "adadelta"
-            self.WEIGHT_DECAY = None
+            self.WEIGHT_DECAY = 0
             self.DROPOUT = 0
         elif preset == 6:
             self.BATCH_SIZE = 200
