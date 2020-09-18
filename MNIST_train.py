@@ -9,14 +9,18 @@ mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, validation_size=5
 
 # 하이퍼파라미터 선언(프리셋 적용)
 presets = [1, 2, 3, 4, 5, 6, 7, 8]
+# 프리셋을 바꿔가며 자동으로 train
 for p in presets:
+    # 루프마다 이전 그래프들을 초기화시킴
     tf.reset_default_graph()
     h_p = hp.hyperparameters(preset=p)
+    # SEED만 같다면 같은 결과값이 나오도록 설정
     tf.set_random_seed(h_p.SEED)
 
     ## 레이어 선언
     X = tf.placeholder(tf.float32, [None, h_p.INPUT_SIZE], name="X")
     Y = tf.placeholder(tf.float32, [None, h_p.OUTPUT_SIZE], name="Y")
+    # 모든 W, B, L을 담아둘 리스트 선언
     W = []
     B = []
     L = []
