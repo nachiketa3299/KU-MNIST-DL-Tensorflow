@@ -1,0 +1,4 @@
+model_checkpoint_path: "C:\\Users\\nachi\\Desktop\\my_project\\dl_assignment_02\\runs\\1600540086\\checkpoints\\model-100"
+all_model_checkpoint_paths: "C:\\Users\\nachi\\Desktop\\my_project\\dl_assignment_02\\runs\\1600540086\\checkpoints\\model-95"
+all_model_checkpoint_paths: "C:\\Users\\nachi\\Desktop\\my_project\\dl_assignment_02\\runs\\1600540086\\checkpoints\\model-97"
+all_model_checkpoint_paths: "C:\\Users\\nachi\\Desktop\\my_project\\dl_assignment_02\\runs\\1600540086\\checkpoints\\model-100"
