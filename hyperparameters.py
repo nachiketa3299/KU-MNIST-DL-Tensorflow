@@ -106,7 +106,7 @@ class hyperparameters:
             self.WEIGHT_DECAY = 0.01
             self.DROPOUT = 0.2
         elif preset == 9:
-            self.BATCH_SIZE = 200
+            self.BATCH_SIZE = 100
             self.LEARNING_RATE = 0.001
             self.ACT_FUNC = "relu"
             self.N_OF_HIDDEN_L = 3
@@ -117,7 +117,7 @@ class hyperparameters:
             self.WEIGHT_DECAY = 0
             self.DROPOUT = 0
         elif preset == 10:
-            self.BATCH_SIZE = 200
+            self.BATCH_SIZE = 100
             self.LEARNING_RATE = 0.001
             self.ACT_FUNC = "relu"
             self.N_OF_HIDDEN_L = 4
@@ -128,7 +128,7 @@ class hyperparameters:
             self.WEIGHT_DECAY = 0
             self.DROPOUT = 0
         elif preset == 11:
-            self.BATCH_SIZE = 200
+            self.BATCH_SIZE = 100
             self.LEARNING_RATE = 0.001
             self.ACT_FUNC = "relu"
             self.N_OF_HIDDEN_L = 5
@@ -139,11 +139,22 @@ class hyperparameters:
             self.WEIGHT_DECAY = 0
             self.DROPOUT = 0
         elif preset == 12:
-            self.BATCH_SIZE = 200
+            self.BATCH_SIZE = 100
             self.LEARNING_RATE = 0.001
             self.ACT_FUNC = "relu"
             self.N_OF_HIDDEN_L = 6
             self.HIDDEN_L_SIZE = (300, 200, 200, 200, 200)
+            self.TRAINING_EPOCH = 100
+            self.WEIGHT_INIT = None
+            self.OPTIMIZER = None
+            self.WEIGHT_DECAY = 0
+            self.DROPOUT = 0
+        elif preset == 13:
+            self.BATCH_SIZE = 100
+            self.LEARNING_RATE = 0.001
+            self.ACT_FUNC = "relu"
+            self.N_OF_HIDDEN_L = 6
+            self.HIDDEN_L_SIZE = (300, 200, 200, 200, 200, 200)
             self.TRAINING_EPOCH = 100
             self.WEIGHT_INIT = None
             self.OPTIMIZER = None

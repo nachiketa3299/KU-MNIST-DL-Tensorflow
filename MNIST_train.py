@@ -8,7 +8,7 @@ import hyperparameters as hp
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, validation_size=5000)
 
 # 하이퍼파라미터 선언(프리셋 적용)
-presets = [1, 2, 3, 4, 5, 6, 7, 8]
+presets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 # 프리셋을 바꿔가며 자동으로 train
 for p in presets:
     # 루프마다 이전 그래프들을 초기화시킴
@@ -182,7 +182,7 @@ for p in presets:
 
         # Terminal output
         print(f'> Preset: {format(p, "02")}  Epoch: {format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  training_cost={"{:.9f}".format(avg_cost)}\tvalidation_accuracy={val_accuracy}')
-        # ./log.txt output
+        # ./train_log.txt output
         file.write(f'preset({h_p.PRESET})\t{format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  {"{:.9f}".format(avg_cost)}  {val_accuracy}\n')
 
         if val_accuracy > max_accuracy:  # validation accuracy가 경신될 때
