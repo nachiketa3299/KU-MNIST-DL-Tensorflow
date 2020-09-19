@@ -8,7 +8,8 @@ import hyperparameters as hp
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, validation_size=5000)
 
 # 하이퍼파라미터 선언(프리셋 적용)
-presets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+presets = [37]
 # 프리셋을 바꿔가며 자동으로 train
 for p in presets:
     # 루프마다 이전 그래프들을 초기화시킴
@@ -207,7 +208,7 @@ for p in presets:
     file = open(filename, 'a')
     if os.path.getsize(filename) == 0:
         file.write("preset\tbatch_size\tactivation_function\t#_of_layers\tlayer_size\ttraining_epoch\tweight_init\toptimizer\tweight_decay\tdropout\ttraining_time\tearly_stopping\tval_maxAcc\ttimestamp\n")
-    file.write(f"{h_p.PRESET}\t{h_p.BATCH_SIZE}\t{h_p.ACT_FUNC}\t{h_p.N_OF_HIDDEN_L}\t{h_p.HIDDEN_L_SIZE}\t{h_p.TRAINING_EPOCH}\t{h_p.WEIGHT_INIT}\t{h_p.OPTIMIZER}\t{h_p.LEARNING_RATE}{h_p.WEIGHT_DECAY}\t{h_p.DROPOUT}\t{training_time}\t{early_stopped}\t{max_accuracy}\t{timestamp}\n")
+    file.write(f"{h_p.PRESET}\t{h_p.BATCH_SIZE}\t{h_p.ACT_FUNC}\t{h_p.N_OF_HIDDEN_L}\t{h_p.HIDDEN_L_SIZE}\t{h_p.TRAINING_EPOCH}\t{h_p.WEIGHT_INIT}\t{h_p.OPTIMIZER}\t{h_p.LEARNING_RATE}\t{h_p.WEIGHT_DECAY}\t{h_p.DROPOUT}\t{training_time}\t{early_stopped}\t{max_accuracy}\t{timestamp}\n")
     file.close()
     sess.close()
 

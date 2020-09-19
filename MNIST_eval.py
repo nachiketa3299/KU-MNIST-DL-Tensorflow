@@ -15,10 +15,8 @@ mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, validation_size=5
 
 # Train된 모델들 찾아서 가져오기
 filenames = os.listdir(os.path.join(os.path.curdir, 'runs'))
-filenames.remove('past')
-filenames.remove('failed')
 
-file = open('./log_eval.txt', 'a')
+file = open('./eval_log.txt', 'w')
 # 모델이 저장된 checkpoint 경로
 for filename in filenames:
     del_all_flags(tf.flags.FLAGS)

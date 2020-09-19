@@ -4,8 +4,6 @@ def makeDir(_filename):
     return os.path.join(os.path.curdir, 'runs', _filename)
 
 filenames = os.listdir(os.path.join(os.path.curdir, 'runs'))
-filenames.remove('past')
-filenames.remove('failed')
 
 # tensorboard --logdir=name1:/path/to/logs/1,name2:/path/to/logs/2
 command_names = []
