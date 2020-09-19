@@ -89,7 +89,9 @@ for p in presets:
         # WeightDecay가 적용된 cost. WEIGHT_DECAY가 0이면 적용되지 않은 것과 같다.
         cost += h_p.WEIGHT_DECAY * weight_decay
 
+    # Train데이터와 정답과 가장 가까운 index끼리 비교하여 같은지 같지 않은지 리턴.
     correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(Y, 1))
+
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     summary_op = tf.summary.scalar("accuracy", accuracy)
 
@@ -134,15 +136,14 @@ for p in presets:
     early_stopped = 0
 
     # training log를 기록하기 위한 txt 파일. ./log.txt
-    filename = f"./log.txt"
+    filename = f"./training_log.txt"
     file = open(filename, 'a')
     file.write(f"{timestamp}\n")
 
     start_time = time.time()
     for epoch in range(h_p.TRAINING_EPOCH):
         # 전체 training data에 대한 평균 loss를 저장할 변수 초기화
-        avg_cost = 0
-        avg_acc = 0
+        avg_cost, avg_acc = 0, 0
         # 총 iteration 횟수 = Mnist 트레이닝 데이터 숫자 / 배치사이즈
         total_batch = int(mnist.train.num_examples / h_p.BATCH_SIZE)
 
@@ -159,11 +160,11 @@ for p in presets:
             # optimizer = tf.train.AdamOptimizer(learning_rate=h_p.LEARNING_RATE).minimize(cost)
             # accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-            c, _, a = sess.run([cost, optimizer, accuracy], feed_dict=feed_dict)
+            _cost, _, _accuracy = sess.run([cost, optimizer, accuracy], feed_dict=feed_dict)
             # cost 에서 Loss들이 구해지고, 그것을 바탕으로 optimizer에서 Backpropagation이 이루어짐, 그리고 모델이 얼마나 정확한 출력을 리턴했는지 accuracy를 측정
             # sess.run을 통해 원하는 operation 실행 및 결과값 return
-            avg_cost += c / total_batch
-            avg_acc += a / total_batch
+            avg_cost += _cost / total_batch
+            avg_acc += _accuracy / total_batch
 
 
         # 시각화를 위한 accuracy 값 저장, validation accuracy 계산
@@ -173,14 +174,16 @@ for p in presets:
 
         # TODO [complete] *hint* dropout 확률을 placeholder에 추가
         # summary_op = tf.summary.scalar("accuracy", accuracy)
-        val_accuracy, summaries = sess.run([accuracy, summary_op], feed_dict={X: mnist.validation.images, Y: mnist.validation.labels, dropout_prob: h_p.DROPOUT})
-        val_summary_writer.add_summary(summaries, epoch)  ##
+        # accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        feed_dict_val = {X: mnist.validation.images,Y: mnist.validation.labels, dropout_prob: h_p.DROPOUT}
+        val_accuracy, summaries = sess.run([accuracy, summary_op], feed_dict=feed_dict_val)
+        val_summary_writer.add_summary(summaries, epoch)
         # ========================================================================
 
         # Terminal output
-        print(f'> Preset: {p}/{len(presets)}  Epoch: {format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  training_cost={"{:.9f}".format(avg_cost)}\tvalidation_accuracy={val_accuracy}')
+        print(f'> Preset: {format(p, "02")}  Epoch: {format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  training_cost={"{:.9f}".format(avg_cost)}\tvalidation_accuracy={val_accuracy}')
         # ./log.txt output
-        file.write(f'preset({h_p.PRESET}/{len(presets)})\t{format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  {"{:.9f}".format(avg_cost)}  {val_accuracy}\n')
+        file.write(f'preset({h_p.PRESET})\t{format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  {"{:.9f}".format(avg_cost)}  {val_accuracy}\n')
 
         if val_accuracy > max_accuracy:  # validation accuracy가 경신될 때
             max_accuracy = val_accuracy
@@ -204,7 +207,7 @@ for p in presets:
     file = open(filename, 'a')
     if os.path.getsize(filename) == 0:
         file.write("preset\tbatch_size\tactivation_function\t#_of_layers\tlayer_size\ttraining_epoch\tweight_init\toptimizer\tweight_decay\tdropout\ttraining_time\tearly_stopping\tval_maxAcc\ttimestamp\n")
-    file.write(f"{h_p.PRESET}\t{h_p.BATCH_SIZE}\t{h_p.ACT_FUNC}\t{h_p.N_OF_HIDDEN_L}\t{h_p.HIDDEN_L_SIZE}\t{h_p.TRAINING_EPOCH}\t{h_p.WEIGHT_INIT}\t{h_p.OPTIMIZER}\t{h_p.WEIGHT_DECAY}\t{h_p.DROPOUT}\t{training_time}\t{early_stopped}\t{max_accuracy}\t{timestamp}\n")
+    file.write(f"{h_p.PRESET}\t{h_p.BATCH_SIZE}\t{h_p.ACT_FUNC}\t{h_p.N_OF_HIDDEN_L}\t{h_p.HIDDEN_L_SIZE}\t{h_p.TRAINING_EPOCH}\t{h_p.WEIGHT_INIT}\t{h_p.OPTIMIZER}\t{h_p.LEARNING_RATE}{h_p.WEIGHT_DECAY}\t{h_p.DROPOUT}\t{training_time}\t{early_stopped}\t{max_accuracy}\t{timestamp}\n")
     file.close()
     sess.close()
 
