@@ -36,12 +36,13 @@ Tensorflow를 이용한 MNIST 신경망 학습
 
 ### 결과
 
-- [MNIST Evaluation Report (2015410115 SongJaemin)](https://docs.google.com/spreadsheets/d/1lyVlKi89FiGkjmlDhz-s3mt6fy0O5eJxtHl7tNmQJzg/edi t?usp=sharing) 
+- [MNIST Evaluation Report (2015410115 SongJaemin)](https://docs.google.com/spreadsheets/d/1lyVlKi89FiGkjmlDhz-s3mt6fy0O5eJxtHl7tNmQJzg/edit?usp=sharing) 
+
 (Google Spreadsheet 링크)
 
 ### 모델 그래프
 
-![model_graph](.\for_report\model_graph.png)
+![model_graph](./for_report/model_graph.png)
 
 ### 하이퍼파라미터 튜닝 과정
 
