@@ -1,3 +1,4 @@
 MNIST_data/
 .idea
 runs/.DS_Store
+./__pycache__
