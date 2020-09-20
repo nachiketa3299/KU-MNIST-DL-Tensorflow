@@ -1,4 +1,7 @@
 class hyperparameters:
+    '''
+    하이퍼파라미터를 쉽게 관리하기 위한 .pt
+    '''
     def __init__(self, preset):
         self.SEED = 1602
 

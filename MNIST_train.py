@@ -32,6 +32,7 @@ for p in presets:
     optimizer = None
     dropout_prob = None
 
+    # Activation Function 결정
     if h_p.ACT_FUNC == 'relu':
         act_func = tf.nn.relu
 
@@ -81,7 +82,7 @@ for p in presets:
     # Dropout을 위한 placeholder 선언
     dropout_prob = tf.placeholder(tf.float32, name="dropout_prob")
 
-    # cost에 Weight Decay
+    # cost에 Weight Decay 적용
     for i in range(len(W)):
         if i == 0:
             weight_decay = tf.nn.l2_loss(W[i])
@@ -103,12 +104,11 @@ for p in presets:
         optimizer = tf.train.AdadeltaOptimizer(learning_rate=h_p.LEARNING_RATE).minimize(cost)
 
 
-    # initialize
+    # Session Initialize
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
 
-    # 저장 directory와 tensor board 시각화를 위한 코드
-    # ========================================================================
+    ## 저장 directory와 tensor board 시각화를 위한 코드
     timestamp = str(int(time.time()))  # runs/{timestamp}/checkpoints/
 
     # ./runs/{timestampe}
@@ -126,7 +126,6 @@ for p in presets:
     checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
     # ./runs/{timestamp}/checkpoints/model
     checkpoint_prefix = os.path.join(checkpoint_dir, "model")
-    # ========================================================================
 
     if not os.path.exists(checkpoint_dir):
         os.makedirs(checkpoint_dir)
@@ -136,14 +135,14 @@ for p in presets:
     max_accuracy = 0
     early_stopped = 0
 
-    # training log를 기록하기 위한 txt 파일. ./log.txt
-    filename = f"./training_log.txt"
+    # Training log를 기록하기 위한 txt 파일 생성 ./log.txt
+    filename = f"./INFOS/training_log.txt"
     file = open(filename, 'a')
     file.write(f"{timestamp}\n")
 
     start_time = time.time()
     for epoch in range(h_p.TRAINING_EPOCH):
-        # 전체 training data에 대한 평균 loss를 저장할 변수 초기화
+        # 전체(모든 Epoch 통합) training data에 대한 평균 loss를 저장할 변수 초기화
         avg_cost, avg_acc = 0, 0
         # 총 iteration 횟수 = Mnist 트레이닝 데이터 숫자 / 배치사이즈
         total_batch = int(mnist.train.num_examples / h_p.BATCH_SIZE)
@@ -152,9 +151,9 @@ for p in presets:
         for i in range(total_batch):
             # batch_xs는 배치 인풋, batch_ys는 배치 정답 (크기는 모두 batch size)
             batch_xs, batch_ys = mnist.train.next_batch(h_p.BATCH_SIZE)
-            # batch size 단위로 input과 정답 리턴, e.g., (100, INPUT_SIZE), (100, 10),
 
-            # TODO [complete] *hint* dropout 확률을 placeholder에 추가
+
+            # Training Model에 먹일 데이터 선언. DROPOUT이 적용되지 않을 경우 확률이 0이 됨.
             feed_dict = {X: batch_xs, Y: batch_ys, dropout_prob: h_p.DROPOUT}
 
             # cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=hypothesis, labels=Y))
@@ -169,19 +168,17 @@ for p in presets:
 
 
         # 시각화를 위한 accuracy 값 저장, validation accuracy 계산
-        # ========================================================================
         train_summary = tf.Summary(value=[tf.Summary.Value(tag='train_accuracy', simple_value=avg_acc)])
         train_summary_writer.add_summary(train_summary, epoch)  ##
 
-        # TODO [complete] *hint* dropout 확률을 placeholder에 추가
         # summary_op = tf.summary.scalar("accuracy", accuracy)
         # accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        # Validation을 위한 feed_dict. Dropout 적용도 동일하다.
         feed_dict_val = {X: mnist.validation.images,Y: mnist.validation.labels, dropout_prob: h_p.DROPOUT}
         val_accuracy, summaries = sess.run([accuracy, summary_op], feed_dict=feed_dict_val)
         val_summary_writer.add_summary(summaries, epoch)
-        # ========================================================================
 
-        # Terminal output
+        # for Terminal output
         print(f'> Preset: {format(p, "02")}  Epoch: {format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  training_cost={"{:.9f}".format(avg_cost)}\tvalidation_accuracy={val_accuracy}')
         # ./train_log.txt output
         file.write(f'preset({h_p.PRESET})\t{format(epoch + 1, "04")}/{format(h_p.TRAINING_EPOCH, "04")}  {"{:.9f}".format(avg_cost)}  {val_accuracy}\n')
@@ -194,7 +191,7 @@ for p in presets:
 
     training_time = (time.time() - start_time) / 60
 
-
+    # for Terminal output
     print(f'\n** Training Finished! (SEED={h_p.SEED})')
     h_p.pprint()
     print(">> Training Results")
@@ -204,7 +201,7 @@ for p in presets:
     print('- Timestamp              :', timestamp)
 
     file.close()
-    filename = "./overral_info.txt"
+    filename = "./INFOS/overral_info.txt"
     file = open(filename, 'a')
     if os.path.getsize(filename) == 0:
         file.write("preset\tbatch_size\tactivation_function\t#_of_layers\tlayer_size\ttraining_epoch\tweight_init\toptimizer\tweight_decay\tdropout\ttraining_time\tearly_stopping\tval_maxAcc\ttimestamp\n")
