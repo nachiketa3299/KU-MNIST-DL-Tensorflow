@@ -9,7 +9,7 @@ mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, validation_size=5
 
 # 하이퍼파라미터 선언(프리셋 적용)
 
-presets = [37]
+presets = list(range(1, 38))
 # 프리셋을 바꿔가며 자동으로 train
 for p in presets:
     # 루프마다 이전 그래프들을 초기화시킴
@@ -174,7 +174,7 @@ for p in presets:
         # summary_op = tf.summary.scalar("accuracy", accuracy)
         # accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
         # Validation을 위한 feed_dict. Dropout 적용도 동일하다.
-        feed_dict_val = {X: mnist.validation.images,Y: mnist.validation.labels, dropout_prob: h_p.DROPOUT}
+        feed_dict_val = {X: mnist.validation.images,Y: mnist.validation.labels, dropout_prob: 0.0}
         val_accuracy, summaries = sess.run([accuracy, summary_op], feed_dict=feed_dict_val)
         val_summary_writer.add_summary(summaries, epoch)
 
